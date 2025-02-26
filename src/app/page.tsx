@@ -4,10 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState, useRef } from 'react';
+// import { analyzeImage } from '@/lib/api';
 
 export default function Home() {
 
 const [selectedImage, setSelectedImage] = useState<string | null>(null);
+const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+const [isAnalyzing, setIsAnalyzing] = useState(false);
+console.log('API Key:', !!process.env.NEXT_PUBLIC_OPENAI_API_KEY); // 只打印是否存在，不打印具体值
 
 const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -17,8 +21,19 @@ const fileInputRef = useRef<HTMLInputElement>(null);
       return;
     }
     const reader = new FileReader();
-    reader.onload = (e) => {
-      setSelectedImage(e.target?.result as string);
+    reader.onload = async (e) => {
+      const base64Image = e.target?.result as string;
+      setSelectedImage(base64Image);
+      setIsAnalyzing(true);
+      try {
+        // const result = await analyzeImage(base64Image);
+        // setAnalysisResult(result);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('分析失败，请稍后重试');
+      } finally {
+        setIsAnalyzing(false);
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -83,7 +98,13 @@ const fileInputRef = useRef<HTMLInputElement>(null);
           <Card className="p-6 space-y-4">
             <h3 className="font-semibold">识别结果</h3>
             <div className="space-y-2">
-              <p className="text-muted-foreground">上传图片后将显示分析结果</p>
+              {isAnalyzing ? (
+                <p className="text-muted-foreground">正在分析图片中...</p>
+              ) : analysisResult ? (
+                <p className="whitespace-pre-line">{analysisResult}</p>
+              ) : (
+                <p className="text-muted-foreground">上传图片后将显示分析结果</p>
+              )}
             </div>
           </Card>
         </div>
