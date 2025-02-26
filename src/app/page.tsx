@@ -1,10 +1,8 @@
 'use client'
-import Image from "next/image";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState, useRef } from 'react';
-// import { analyzeImage } from '@/lib/api';
+import { analyzeImage } from '@/lib/api';
 
 export default function Home() {
 
@@ -26,8 +24,8 @@ const fileInputRef = useRef<HTMLInputElement>(null);
       setSelectedImage(base64Image);
       setIsAnalyzing(true);
       try {
-        // const result = await analyzeImage(base64Image);
-        // setAnalysisResult(result);
+        const result = await analyzeImage(base64Image);
+        setAnalysisResult(result);
       } catch (error) {
         console.error('Error:', error);
         alert('分析失败，请稍后重试');
